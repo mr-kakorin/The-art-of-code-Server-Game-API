@@ -26,9 +26,12 @@ socket.on('connect', () => {
 		})
 	})
 	
-	/*socket.emit('auth', JSON.stringify({accessToken:'e44054853487293b042aabbe43f2f910'}));
+	/*socket.emit('auth', JSON.stringify({accessToken:'8f218a4b929e620da0a75d741b7211e8'}));
 	socket.on('auth', obj => {
-		socket.emit('code', `let counter = setInterval( () => {console.log('${makeid()}');}, 5000)`)
+		//socket.emit('code', `let counter = setInterval( () => {console.log('${makeid()}');}, 5000)`)
+		socket.on('initData', data => {
+			console.log(data);
+		})
 	})*/
 	console.log('is connected')
 });

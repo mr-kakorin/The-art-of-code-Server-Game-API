@@ -156,7 +156,7 @@ const getHeroIdByToken = accessToken => new Promise((resolve, reject) => {
 
     db.execute(`select heroId from users where accessToken=${SqlString(accessToken)};`)
         .then(([rows, fields]) => {
-            resolve(rows[0].id);
+            resolve(rows[0].heroId);
         })
         .catch(error => {
             console.log(error);
