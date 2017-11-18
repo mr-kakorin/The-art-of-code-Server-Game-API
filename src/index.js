@@ -6,49 +6,51 @@ const WebSocket = require('socket.io');
 const app = express();
 const socketActions = require('./GameAPISocketActions');
 
-app.use(function(req, res) {
-
-});
+app.use(require('body-parser')());
+app.get('/', (req, res) => res.send('ok'));
 
 const server = http.createServer(app);
-const wss = WebSocket(server);
+const WebSocketServer = WebSocket(server);
 
-let wss.clients = {};
+WebSocketServer.clients = {};
 
-wss.on('connection', function connection(ws, req) {
-	const location = url.parse(req.url, true);
+WebSocketServer.on('connection', function connection(webSocketClient) {
+	
+	console.log('someone connected, wainting authorization with access token')
 
-	// You might use location.query.access_token to authenticate or share sessions
-	// or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
-	let id = Math.random();
+	webSocketClient.on('auth', function incoming(authData) {
+		console.log('received: %s', authData);
+		let acessToken = authData.acessToken;
+		let location = authData.location;
 
-	wss.clients[id] = {
-		socket: ws,
-		location: location
-	};
+		WebSocketServer.clients[acessToken] = {
+			socket: webSocketClient,
+			location: location || '',
+		};
 
-	Object.keys(socketActions).forEach(function(actionName) {
-		var fn = socketActions[actionName].bind(wss);
-		clients[id].ws.on(actionName, fn);
+		Object.keys(socketActions).forEach(function(actionName) {
+			var fn = socketActions[actionName].bind(WebSocketServer);
+			WebSocketServer.clients[acessToken].socket.on(actionName, fn);
+		});
+
+		WebSocketServer.clients[acessToken].socket.send('authed');
+
+		webSocketClient.on('close', function() {
+			console.log('соединение закрыто ' + acessToken);
+			delete WebSocketServer.clients[acessToken];
+		});
 	});
 
-	ws.on('message', function incoming(message) {
-		console.log('received: %s', message);
-	});
 
-	ws.on('close', function() {
-		console.log('соединение закрыто ' + id);
-		delete clients[id];
-	});
 });
 
-wss.broadcast = (data) => {
-	Object.keys(wss.clients).forEach(clientId => {
-		if (wss.clients[clientId].readyState === WebSocket.OPEN) {
-			if(!data.action)
-				wss.clients[clientId].send(data);
+WebSocketServer.broadcast = (data) => {
+	Object.keys(WebSocketServer.clients).forEach(clientId => {
+		if (WebSocketServer.clients[clientId].readyState === WebSocket.OPEN) {
+			if (!data.action)
+				WebSocketServer.clients[clientId].send(data);
 			else
-				wss.clients[clientId].emit(data.action, data.object);
+				WebSocketServer.clients[clientId].emit(data.action, data.object);
 		}
 	});
 };

@@ -1,4 +1,4 @@
-const GameInformationAPI = require('./GameInformationAPI');
+//const GameInformationAPI = require('./GameInformationAPI');
 
 exports.move = (socketMessage) => {
 
@@ -9,7 +9,7 @@ exports.move = (socketMessage) => {
 		moveTargetId: socketMessage.moveTargetId,
 	}
 
-	GameInformationAPI.move(target);
+	//GameInformationAPI.move(target);
 
 	let messageToAll = {
 		action: 'move',
@@ -27,7 +27,7 @@ exports.attack = (socketMessage) => {
 		attackTargetId: socketMessage.attackTargetId,
 	}
 
-	GameInformationAPI.attack(target);
+	//GameInformationAPI.attack(target);
 
 	let messageToAll = {
 		action: 'attack',
@@ -56,7 +56,7 @@ exports.use = (socketMessage) => {
 		target:target,
 	};
 
-	GameInformationAPI.use(usable);
+	//GameInformationAPI.use(usable);
 
 	let messageToAll = {
 		action: 'use',
