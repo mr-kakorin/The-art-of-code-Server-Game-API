@@ -119,7 +119,7 @@ WebSocketServer.broadcast = (data) => {
 			if (!data.action)
 				WebSocketServer.clients[clientId].socket.send(data);
 			else
-				WebSocketServer.clients[clientId].socket.emit(data.action, data.object);
+				WebSocketServer.clients[clientId].socket.emit(data.action, JSON.stringify(data.object));
 		}
 	});
 };
