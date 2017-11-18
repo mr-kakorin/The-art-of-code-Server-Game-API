@@ -22,6 +22,7 @@ create table users (
 
 create table heroes (
     id int unsigned not null auto_increment,
+    login varchar(60) not null,
     userId int unsigned not null,
     positionX int unsigned not null,
     positionY int unsigned not null,

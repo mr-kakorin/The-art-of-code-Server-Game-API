@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const url = require('url');
 const WebSocket = require('socket.io');
+const database = require('./lib/db.js').connect();
 
 const app = express();
 const socketActions = require('./GameAPISocketActions');
@@ -40,6 +41,19 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 			delete WebSocketServer.clients[acessToken];
 		});
 	});
+
+	webSocketClient.on('register', function register(registerData) {
+		console.log('user register aka %s', registerData);
+
+		let login = registerData.login;
+		let password = registerData.password;
+		let herologin = registerData.nickname;
+
+		datbase.register(login, password, herologin)
+		.then( accessToken => {
+			webSocketClient.emit('register', accessToken);
+		});
+	})
 });
 
 WebSocketServer.broadcast = (data) => {

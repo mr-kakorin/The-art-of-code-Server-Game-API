@@ -26,6 +26,67 @@ const get = () => {
     return state.db;
 }
 
+
+const register = (login, passowrd, nickname) => new Promise( (resolve, reject) => {
+    let db = get();
+
+    let accessToken = guid();
+    let dockerName = login+'Docker'
+
+    let userId = null;
+
+    db.execute(
+        `
+            insert into users
+            ( login, password, accessToken, docker )
+            values
+            ( ${SqlString(login)}, ${SqlString(password)}, ${SqlString(accessToken)}, ${SqlString(docker)} );
+        `
+    )
+    .then( result => {
+
+        userId = result.insertId;
+        return db.execute(
+            `
+                insert into heroes
+                    (
+                        login, 
+                        userId, 
+                        positionX, 
+                        positionY, 
+                        HP, 
+                        maxHP, 
+                        attack, 
+                        defence, 
+                        lvl, 
+                        exp
+                    )
+                values
+                    (
+                        ${SqlString(nickname)},
+                        ${result.insertId},
+                        0,
+                        0,
+                        100,
+                        100,
+                        15,
+                        5,
+                        1,
+                        0
+                    );
+            `
+        )
+    })
+    .then( result => {
+
+        return db.execute(`update users set heroId=${result.insertId} where id=${userId};`)
+    })
+    .then( () => {
+        resolve(accessToken);
+    })
+    .catch(reject);
+})
+
 const moveHero = (heroId, newPosition) => {
     let db = get();
 
@@ -96,8 +157,19 @@ const SqlBool = (b) => {
     }
 };
 
+function guid () {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4()+s4()+s4()+s4()+
+    s4()+s4()+s4()+s4();
+}
+
 module.exports = {
     connect: connect,
     disconnect: disconnect,
     get: get,
+    register
 };
