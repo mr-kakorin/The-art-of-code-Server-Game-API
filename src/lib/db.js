@@ -13,6 +13,7 @@ const connect = (opts, done) => {
 
     mysql.createConnection(opts)
         .then(connection => {
+            console.log('mysql connected')
             state.db = connection;
             state.db.query("SET SESSION wait_timeout = 604800");
 
@@ -39,13 +40,14 @@ const connect = (opts, done) => {
                     })
             };
 
+            done();
+
             try {
                 handleDisconnect()
             } catch (e) {
                 console.log('Error handleDisconnect Mysql:\n', e);
             }
 
-            done();
         })
         .catch(err => done(err));
 }
@@ -58,27 +60,27 @@ const get = () => {
     return state.db;
 }
 
-const register = (login, password, nickname) => new Promise( (resolve, reject) => {
+const register = (login, password, nickname) => new Promise((resolve, reject) => {
     let db = get();
 
     let accessToken = guid();
-    let dockerName = login+'Docker'
+    let dockerName = login + 'Docker'
 
     let userId = null;
 
     db.execute(
-        `
+            `
             insert into users
             ( login, password, accessToken, docker )
             values
             ( ${SqlString(login)}, ${SqlString(password)}, ${SqlString(accessToken)}, ${SqlString(dockerName)} );
         `
-    )
-    .then( result => {
+        )
+        .then(result => {
 
-        console.log(result);
-        userId = result[0].insertId;
-        let str = `
+            console.log(result);
+            userId = result[0].insertId;
+            let str = `
                 insert into heroes
                     (
                         login, 
@@ -108,45 +110,58 @@ const register = (login, password, nickname) => new Promise( (resolve, reject) =
                         'location'
                     );
             `;
-        console.log(str);
-        return db.execute(str);
-    })
-    .then( result => {
+            console.log(str);
+            return db.execute(str);
+        })
+        .then(result => {
 
-        return db.execute(`update users set heroId=${result[0].insertId} where id=${userId};`)
-    })
-    .then( () => {
-        resolve(accessToken);
-    })
-    .catch(error => {
-        console.log(error);
-    });
+            return db.execute(`update users set heroId=${result[0].insertId} where id=${userId};`)
+        })
+        .then(() => {
+            resolve(accessToken);
+        })
+        .catch(error => {
+            console.log(error);
+        });
 })
 
-const login = (login, password) => new Promise( (resolve, reject) => {
+const login = (login, password) => new Promise((resolve, reject) => {
     let db = get();
 
     db.execute(`select * from users where login=${SqlString(login)};`)
-    .then( ([rows, fields]) => {
-        let accessToken = rows[0].accessToken;
+        .then(([rows, fields]) => {
+            let accessToken = rows[0].accessToken;
 
-        resolve(accessToken);
-    }).catch( error => {
-        console.log(error);
-        reject(error);
-    })
+            resolve(accessToken);
+        }).catch(error => {
+            console.log(error);
+            reject(error);
+        })
 })
 
-const getLoginByAccessToken = accessToken => new Promise( (resolve, reject) => {
+const getLoginByAccessToken = accessToken => new Promise((resolve, reject) => {
     let db = get();
 
     db.execute(`select login from users where accessToken=${SqlString(accessToken)};`)
-    .then( ([rows, fields]) => {
-        resolve(rows[0].login);
-    }).catch( error =>{
-        console.log(error);
-        reject(error);
-    })
+        .then(([rows, fields]) => {
+            resolve(rows[0].login);
+        }).catch(error => {
+            console.log(error);
+            reject(error);
+        })
+})
+
+const getHeroIdByToken = accessToken => new Promise((resolve, reject) => {
+    let db = get();
+
+    db.execute(`select heroId from users where accessToken=${SqlString(accessToken)};`)
+        .then(([rows, fields]) => {
+            resolve(rows[0].id);
+        })
+        .catch(error => {
+            console.log(error);
+            reject(error);
+        })
 })
 
 const move = (object, newPosition) => {
@@ -179,6 +194,13 @@ const changeFiled = (object, newValue, predicate) => {
         `
     ).catch(console.log)
 }
+const loadContent = (table) => new Promise((resolve, reject) => {
+    state.db.execute(`select * from ${table};`)
+        .then(([rows, fileds]) => {
+            resolve(rows)
+        })
+        .catch(console.log);
+});
 
 const SqlString = (s) => {
     if (s)
@@ -221,14 +243,14 @@ const SqlBool = (b) => {
     }
 };
 
-function guid () {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-  return s4()+s4()+s4()+s4()+
-    s4()+s4()+s4()+s4();
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    return s4() + s4() + s4() + s4() +
+        s4() + s4() + s4() + s4();
 }
 
 module.exports = {
@@ -240,4 +262,5 @@ module.exports = {
     getLoginByAccessToken,
     move: move,
     changeFiled: changeFiled,
+    loadContent
 };

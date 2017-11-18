@@ -18,13 +18,13 @@ class Memory {
 		this._players = {};
 		this._dynamicObjects = {};
 
-		let locationsPath = path.join(__dirname, '../resource/locations.json'),
-			itemsPath = path.join(__dirname, '../resource/items.json');
+		let locationsPath = path.join(__dirname, '../../resource/locations.json'),
+			itemsPath = path.join(__dirname, '../../resource/items.json');
 
-		LoadInMemoryJson(locationsPath, this._locations);
-		LoadInMemoryJson(itemsPath, this._items);
-		LoadInMemoryFromDB('heroes', this._players);
-		LoadInMemoryFromDB('objects', this._staticObjects);
+		this.LoadInMemoryJson(locationsPath, this._locations);
+		this.LoadInMemoryJson(itemsPath, this._items);
+		this.LoadInMemoryFromDB('heroes', this._players);
+		this.LoadInMemoryFromDB('objects', this._staticObjects);
 	}
 
 	static get instance() {
@@ -40,6 +40,20 @@ class Memory {
 
 	get items() {
 		return this._items;
+	}
+
+	getHero(heroId) {
+		let result = null; 
+		this._players.forEach(player=>{
+			if(player.id == heroId)
+				result = player;
+			return;
+		})
+		return result;
+	}
+
+	get objects(){
+		return this._objects;
 	}
 
 	LoadInMemoryJson(resourcePath, resourceContainer) {

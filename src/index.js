@@ -3,8 +3,15 @@ const http = require('http');
 const url = require('url');
 const WebSocket = require('socket.io');
 const database = require('./lib/db.js');
-database.connect(require('../config.json').mysqlConnectionSettings);
-//const MemoryManager = require('./lib/mem.js');
+const MemoryManager = require('./lib/mem.js');
+
+let mem = null;
+
+database.connect(require('../config.json').mysqlConnectionSettings, (err) => {
+	mem = MemoryManager.instance;
+});
+
+
 
 const dockerManager = require('./lib/dockerManager.js');
 const path = require('path');
@@ -16,19 +23,18 @@ app.use(require('body-parser')());
 app.get('/', (req, res) => res.send('ok'));
 app.get('/code/:login', (req, res) => {
 	let login = req.params.login;
-	
-	res.sendFile(path.join(__dirname, '../userfiles/', login+'.js'));
+
+	res.sendFile(path.join(__dirname, '../userfiles/', login + '.js'));
 })
 
 const server = http.createServer(app);
 const WebSocketServer = WebSocket(server);
 
-//const mem = MemoryManager.instance();
 
 WebSocketServer.clients = {};
 
 WebSocketServer.on('connection', function connection(webSocketClient) {
-	
+
 	console.log('someone connected, wainting authorization with access token')
 
 	webSocketClient.on('auth', function incoming(authData) {
@@ -37,7 +43,16 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		let accessToken = authData.accessToken;
 		let location = authData.location;
 
-		webSocketClient.emit('auth', 'success');
+		database.getHeroIdByToken(accessToken)
+			.then(heroId => {
+				let initData = {
+					hero:mem.getHero(heroId),
+					locations:mem.locations,
+					items:mem.items,
+					objects:mem.objects
+				}
+				webSocketClient.emit('auth', initData);
+			})
 
 		WebSocketServer.clients[accessToken] = {
 			socket: webSocketClient,
@@ -56,10 +71,10 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 			delete WebSocketServer.clients[accessToken];
 		});
 
-		webSocketClient.on('code', function onCode (code) {
+		webSocketClient.on('code', function onCode(code) {
 			console.log('try start code: %s', code);
 			dockerManager.writeCode(accessToken, code)
-			.then( () => {});
+				.then(() => {});
 			dockerManager.restartCode(accessToken);
 		})
 	});
@@ -73,10 +88,10 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		let herologin = registerData.nickname;
 
 		database.register(login, password, herologin)
-		.then( accessToken => {
-			webSocketClient.emit('register', accessToken);
-			dockerManager.createContainer(login), accessToken;
-		});
+			.then(accessToken => {
+				webSocketClient.emit('register', accessToken);
+				dockerManager.createContainer(login), accessToken;
+			});
 	});
 
 	webSocketClient.on('login', function login(loginData) {
@@ -87,9 +102,9 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		let password = loginData.password;
 
 		database.login(login, password)
-		.then( accessToken => {
-			webSocketClient.emit('login', accessToken);
-		});
+			.then(accessToken => {
+				webSocketClient.emit('login', accessToken);
+			});
 	})
 });
 
