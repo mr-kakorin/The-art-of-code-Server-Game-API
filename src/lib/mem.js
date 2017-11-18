@@ -3,7 +3,7 @@ const path = require('path');
 
 const singleton = Symbol();
 const singletonMemory = Symbol();
-const DB = require("./lib/db");
+const DB = require('./db');
 
 class Memory {
 	constructor(memory) {
