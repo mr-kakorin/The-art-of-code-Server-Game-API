@@ -43,6 +43,8 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		let accessToken = authData.accessToken;
 		let location = authData.location;
 
+		webSocketClient.emit('auth', 'succsess');
+
 		database.getHeroIdByToken(accessToken)
 			.then(heroId => {
 				let initData = {
@@ -51,7 +53,7 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 					items:mem.items,
 					objects:mem.objects
 				}
-				webSocketClient.emit('auth', initData);
+				webSocketClient.emit('initData', initData);
 			})
 
 		WebSocketServer.clients[accessToken] = {
