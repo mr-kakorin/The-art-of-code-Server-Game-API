@@ -46,9 +46,9 @@ WebSocketServer.broadcast = (data) => {
 	Object.keys(WebSocketServer.clients).forEach(clientId => {
 		if (WebSocketServer.clients[clientId].readyState === WebSocket.OPEN) {
 			if (!data.action)
-				WebSocketServer.clients[clientId].send(data);
+				WebSocketServer.clients[clientId].socket.send(data);
 			else
-				WebSocketServer.clients[clientId].emit(data.action, data.object);
+				WebSocketServer.clients[clientId].socket.emit(data.action, data.object);
 		}
 	});
 };
