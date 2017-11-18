@@ -8,7 +8,7 @@ const MemoryManager = require('./lib/mem.js');
 let mem = null;
 
 database.connect(require('../config.json').mysqlConnectionSettings, (err) => {
-	//mem = MemoryManager.instance;
+	mem = MemoryManager.instance;
 });
 
 
