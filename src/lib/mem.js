@@ -21,8 +21,14 @@ class Memory {
 		let locationsPath = path.join(__dirname, '../../resource/locations.json'),
 			itemsPath = path.join(__dirname, '../../resource/items.json');
 
-		this.LoadInMemoryJson(locationsPath, this._locations);
-		this.LoadInMemoryJson(itemsPath, this._items);
+		this.LoadInMemoryJson(locationsPath)
+			.then(resources => {
+				this._locations = resources;
+			});
+		this.LoadInMemoryJson(itemsPath)
+			.then(resources => {
+				this._items = resources;
+			});
 		this.LoadInMemoryFromDB('heroes').then(resources => {
 			this._players = resources;
 		});
@@ -56,18 +62,31 @@ class Memory {
 		return result;
 	}
 
+	move(object, newPosition) {
+		moveObjectId = object.id,
+			this._dynamicObjects.forEach(dObject => {
+				if (dObject.id == moveObjectId) {
+					dObject.positionX = newPosition.x;
+					dObject.positionY = newPosition.y;
+				}
+				return;
+			})
+	}
+
 	get objects() {
 		return this._objects;
 	}
 
-	LoadInMemoryJson(resourcePath, resourceContainer) {
-		fs.readFile(resourcePath, 'utf8', function(err, data) {
-			if (!err) {
-				console.log(`Success read resource ${resourcePath}`);
-				resourceContainer = JSON.parse(data);
-			} else {
-				console.log(`Error read resource ${resourcePath}`);
-			}
+	LoadInMemoryJson(resourcePath) {
+		return new Promise((resolve, reject) => {
+			fs.readFile(resourcePath, 'utf8', function(err, data) {
+				if (!err) {
+					console.log(`Success read resource ${resourcePath}`);
+					resolve(JSON.parse(data));
+				} else {
+					console.log(`Error read resource ${resourcePath}`);
+				}
+			});
 		});
 	}
 
