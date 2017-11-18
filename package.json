@@ -21,6 +21,7 @@
       "resolved": "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.0.tgz",
       "version": "1.0.0"
     },
+    "berkeleydb": "^0.2.1",
     "body-parser": "^1.18.2",
     "bytes": {
       "integrity": "sha1-0ygVQE1olpn4Wk6k+odV3ROpYEg=",

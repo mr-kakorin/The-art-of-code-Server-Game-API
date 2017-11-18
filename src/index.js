@@ -2,6 +2,9 @@ const express = require('express');
 const http = require('http');
 const url = require('url');
 const WebSocket = require('socket.io');
+const database = require('./lib/db.js').connect(require('../config.json').mysqlConnectionSettings);
+const MemoryManager('./lib/mem.js');
+
 const database = require('./lib/db.js');
 const dockerManager = require('./lib/dockerManager.js');
 const path = require('path');
@@ -20,6 +23,8 @@ app.get('/code/:login', (req, res) => {
 
 const server = http.createServer(app);
 const WebSocketServer = WebSocket(server);
+
+const mem = MemoryManager.instance();
 
 WebSocketServer.clients = {};
 

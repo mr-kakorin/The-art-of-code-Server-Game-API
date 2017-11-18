@@ -1,19 +1,26 @@
 const DB = require("./lib/db");
-const 
+const ManageCurrentMemory = require('./lib/mem')
 
 const DBStateSaveBehaviourTargets = ['heroes', 'objects'];
 
-const move = (target) =>{
-	if (DBStateSaveBehaviourTargets.indexOf(target.moveTargetType)!=-1){
+const move = (target) => {
+	if (DBStateSaveBehaviourTargets.indexOf(target.moveTargetType) != -1) {
 		let object = {
-			id:target.moveTargetId,
-			type:target.moveTargetType,
+			id: target.moveTargetId,
+			type: target.moveTargetType,
 		}
 		DB.move(object, target.moveTargetType);
-	}
-	else{
+	} else {
+		let object = {
+			id: target.moveTargetId,
+			type: target.moveTargetType,
+		}
 
 	}
 }
 
-module.exports ={move:move, attack:attack, use:use}
+module.exports = {
+	move: move,
+	attack: attack,
+	use: use
+}
