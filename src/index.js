@@ -4,6 +4,7 @@ const url = require('url');
 const WebSocket = require('socket.io');
 const database = require('./lib/db.js');
 const dockerManager = require('./lib/dockerManager.js');
+const path = require('path');
 database.connect(require('../config.json').mysqlConnectionSettings);
 
 const app = express();
@@ -11,6 +12,11 @@ const socketActions = require('./GameAPISocketActions');
 
 app.use(require('body-parser')());
 app.get('/', (req, res) => res.send('ok'));
+app.get('/code/:login', (req, res) => {
+	let login = req.params.login;
+	
+	res.sendFile(path.join(__dirname, '../userfiles/', login+'.js'));
+})
 
 const server = http.createServer(app);
 const WebSocketServer = WebSocket(server);
@@ -50,6 +56,7 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 			console.log('try start code: %s', code);
 			dockerManager.writeCode(accessToken, code)
 			.then( () => {});
+			dockerManager.restartCode(accessToken);
 		})
 	});
 
@@ -64,6 +71,7 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		database.register(login, password, herologin)
 		.then( accessToken => {
 			webSocketClient.emit('register', accessToken);
+			dockerManager.createContainer(login), accessToken;
 		});
 	});
 

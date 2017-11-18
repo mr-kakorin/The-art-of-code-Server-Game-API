@@ -137,6 +137,18 @@ const login = (login, password) => new Promise( (resolve, reject) => {
     })
 })
 
+const getLoginByAccessToken = accessToken => new Promise( (resolve, reject) => {
+    let db = get();
+
+    db.execute(`select login from users where accessToken=${SqlString(accessToken)};`)
+    .then( ([rows, fields]) => {
+        resolve(rows[0].login);
+    }).catch( error =>{
+        console.log(error);
+        reject(error);
+    })
+})
+
 const move = (object, newPosition) => {
     let db = get(),
         moveObjectId = object.id,
@@ -225,6 +237,7 @@ module.exports = {
     get: get,
     register,
     login,
+    getLoginByAccessToken,
     move: move,
     changeFiled: changeFiled,
 };
