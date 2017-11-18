@@ -23,8 +23,12 @@ class Memory {
 
 		this.LoadInMemoryJson(locationsPath, this._locations);
 		this.LoadInMemoryJson(itemsPath, this._items);
-		this.LoadInMemoryFromDB('heroes', this._players);
-		this.LoadInMemoryFromDB('objects', this._staticObjects);
+		this.LoadInMemoryFromDB('heroes').then(resources => {
+			this._players = resources;
+		});
+		this.LoadInMemoryFromDB('objects').then(resources => {
+			this._staticObjects = resources;
+		});
 	}
 
 	static get instance() {
@@ -43,16 +47,16 @@ class Memory {
 	}
 
 	getHero(heroId) {
-		let result = null; 
-		this._players.forEach(player=>{
-			if(player.id == heroId)
+		let result = null;
+		this._players.forEach(player => {
+			if (player.id == heroId)
 				result = player;
 			return;
 		})
 		return result;
 	}
 
-	get objects(){
+	get objects() {
 		return this._objects;
 	}
 
@@ -67,15 +71,8 @@ class Memory {
 		});
 	}
 
-	LoadInMemoryFromDB(tableName, resourceContainer) {
-		DB.loadContent(tableName)
-			.then(resources => {
-				resourceContainer = resources;
-			})
-			.catch(err => {
-				console.log(err);
-				reject(err);
-			})
+	LoadInMemoryFromDB(tableName) {
+		return DB.loadContent(tableName)
 	}
 
 	get type() {
