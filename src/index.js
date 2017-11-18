@@ -48,7 +48,7 @@ wss.broadcast = (data) => {
 			if(!data.action)
 				wss.clients[clientId].send(data);
 			else
-				wss.emit(data.action, data.object);
+				wss.clients[clientId].emit(data.action, data.object);
 		}
 	});
 };
