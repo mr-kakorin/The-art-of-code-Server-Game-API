@@ -1,4 +1,5 @@
-const db = require("./lib/db");
+const DB = require("./lib/db");
+const 
 
 const DBStateSaveBehaviourTargets = ['heroes', 'objects'];
 
@@ -8,6 +9,7 @@ const move = (target) =>{
 			id:target.moveTargetId,
 			type:target.moveTargetType,
 		}
+		DB.move(object, target.moveTargetType);
 	}
 	else{
 
