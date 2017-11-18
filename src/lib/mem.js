@@ -34,6 +34,14 @@ class Memory {
 		return this[singleton];
 	}
 
+	get locations() {
+		return this._locations;
+	}
+
+	get items() {
+		return this._items;
+	}
+
 	LoadInMemoryJson(resourcePath, resourceContainer) {
 		fs.readFile(resourcePath, 'utf8', function(err, data) {
 			if (!err) {
