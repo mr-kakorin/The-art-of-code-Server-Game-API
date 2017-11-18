@@ -6,6 +6,7 @@ const state = {
 };
 
 const connect = (opts, done) => {
+    if (!done) done = () => {};
     if (state.db) {
         return done();
     }
@@ -16,7 +17,7 @@ const connect = (opts, done) => {
             state.db.query("SET SESSION wait_timeout = 604800");
 
             const handleDisconnect = () => {
-                mysql_obj.connection.query('select 1;')
+                state.db.query('select 1;')
                     .then(response => {
                         if (!response.Error)
                             return true;
@@ -203,7 +204,7 @@ module.exports = {
     connect: connect,
     disconnect: disconnect,
     get: get,
-    register
+    register,
     move: move,
     changeFiled: changeFiled,
 };
