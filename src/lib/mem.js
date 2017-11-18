@@ -14,9 +14,10 @@ class Memory {
 		this._type = 'Memory';
 		this._locations = {};
 		this._items = {};
-		this._staticObjects = {};
+		this._staticObjects = [];
 		this._players = {};
-		this._dynamicObjects = {};
+		this._dynamicObjects = [];
+		this._users = {};
 
 		let locationsPath = path.join(__dirname, '../../resource/locations.json'),
 			itemsPath = path.join(__dirname, '../../resource/items.json');
@@ -34,6 +35,9 @@ class Memory {
 		});
 		this.LoadInMemoryFromDB('objects').then(resources => {
 			this._staticObjects = resources;
+		});
+		this.LoadInMemoryFromDB('users').then(resources => {
+			this._users = resources;
 		});
 	}
 
@@ -62,19 +66,75 @@ class Memory {
 		return result;
 	}
 
-	move(object, newPosition) {
-		moveObjectId = object.id,
-			this._dynamicObjects.forEach(dObject => {
-				if (dObject.id == moveObjectId) {
-					dObject.positionX = newPosition.x;
-					dObject.positionY = newPosition.y;
-				}
-				return;
-			})
+	getHeroByAccessToken(accessToken) {
+		let heroId = null;
+		this._users.forEach(user => {
+			if (user.accessToken == accessToken) {
+				heroId = user.heroId;
+			}
+		})
+		return this.getHero(heroId)
+	}
+
+	move(object, changePosition) {
+		let moveObjectId = object.id,
+			moveObjectType = object.type;
+		switch (moveObjectType) {
+			case "hero":
+				this._players.forEach(player => {
+					if (player.id == moveObjectId) {
+						let newx = player.positionX + changePosition.x;
+						let newy = player.positionY + changePosition.y;
+						if (isFreePosition(newx, newy)) {
+							player.positionX += changePosition.x;
+							player.positionY += changePosition.y;
+							return {
+								x: player.positionX,
+								y: player.positionY
+							}
+						} else return false;
+					}
+					return;
+				})
+				break;
+			case "staticObject":
+				this._staticObjects.forEach(sObject => {
+					if (sObject.id == moveObjectId) {
+						sObject.positionX += changePosition.x;
+						sObject.positionY += changePosition.y;
+					}
+					return;
+				})
+				break;
+			case "dynamicObject":
+				this._dynamicObjects.forEach(dObject => {
+					if (dObject.id == moveObjectId) {
+						dObject.positionX += changePosition.x;
+						dObject.positionY += changePosition.y;
+					}
+					return;
+				})
+				break;
+		}
 	}
 
 	get objects() {
 		return this._objects;
+	}
+
+	isFreePosition(x, y) {
+		let result = true;
+		this._staticObjects.foreach(obj => {
+			if (obj.x == x && obj.y == y) {
+				result = false;
+			}
+		})
+		this._dynamicObjects.foreach(obj => {
+			if (obj.x == x && obj.y == y) {
+				result = false;
+			}
+		})
+		return result;
 	}
 
 	LoadInMemoryJson(resourcePath) {

@@ -8,7 +8,7 @@ const MemoryManager = require('./lib/mem.js');
 let mem = null;
 
 database.connect(require('../config.json').mysqlConnectionSettings, (err) => {
-	mem = MemoryManager.instance;
+	//mem = MemoryManager.instance;
 });
 
 
@@ -49,10 +49,10 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 			database.getHeroIdByToken(accessToken)
 			.then(heroId => {
 				let initData = {
-					hero:mem.getHero(heroId),
-					locations:mem.locations,
-					items:mem.items,
-					objects:mem.objects
+					hero: mem.getHero(heroId),
+					locations: mem.locations,
+					items: mem.items,
+					objects: mem.objects
 				}
 				console.log('initData')
 				webSocketClient.emit('initData', JSON.stringify(initData));
