@@ -164,7 +164,7 @@ const getHeroIdByToken = accessToken => new Promise((resolve, reject) => {
         })
 })
 
-const move = (object, newPosition) => {
+const move = (object, changePosition) => {
     let db = get(),
         moveObjectId = object.id,
         fromWhatMove = object.type === 'hero' ? "heroes" : "objects";
@@ -172,7 +172,7 @@ const move = (object, newPosition) => {
     db.execute(
         `
             update ${fromWhatMove} 
-            set positionX = ${newPosition.x}, positionY = ${newPosition.y}
+            set positionX = positionX + ${newPosition.x}, positionY = positionY + ${newPosition.y}
             where id = ${moveObjectId};
         `
     ).catch(console.log)
