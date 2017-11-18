@@ -1,0 +1,139 @@
+[
+    {
+        "id": 0,
+        "title": "Coins",
+        "stackable": true,
+		"cost": 1,
+        "slug": "coins",
+        "description": "Coins. Incredible.",
+		"type": "money"
+    },
+    {
+        "id": 1,
+        "title": "Gem",
+        "cost": 100,
+        "stackable": true,
+        "maxStack": 10,
+        "slug": "gem",
+        "description": "A shiny gem.",
+        "type": "misc"
+    },
+    {
+        "id": 2,
+        "title": "Scroll",
+        "stackable": true,
+        "cost": 50,
+        "slug": "scroll",
+        "description": "Scroll...",
+        "type": "misc"
+    },
+    {
+        "id": 3,
+        "title": "Book",
+        "stackable": true,
+        "cost": 1000,
+        "slug": "book",
+        "description": "Books make you smarter.",
+        "type": "misc"
+    },
+    {
+        "id": 4,
+        "title": "Health Potion",
+        "stackable": true,
+        "cost": 25,
+        "slug": "hp",
+        "description": "This potion restores your health.",
+        "type": "potion",
+		"effect": "hp+100"
+    },
+    {
+        "id": 5,
+        "title": "Apple",
+        "stackable": true,
+        "cost": 5,
+        "slug": "apple",
+        "description": "Apple restores your health.",
+        "type": "food",
+		"effect": "hp+20"
+    },
+    {
+        "id": 6,
+        "title": "Sword",
+        "stackable": false,
+        "cost": 1000,
+        "slug": "sword",
+        "description": "A sharp sword for mighty warriors.",
+        "type": "weapon",
+		"effect": "attack+5"
+    },
+    {
+        "id": 7,
+        "title": "Bow",
+        "stackable": false,
+        "cost": 1000,
+        "slug": "weapon",
+        "description": "This potion restores your health.",
+        "type": "weapon",
+        "effect": "attack+3,range+2"
+    },
+    {
+        "id": 8,
+        "title": "Chestplate",
+        "stackable": false,
+        "cost": 1000,
+        "slug": "armor",
+        "description": "A chestplate. Wow.",
+        "type": "armor_chest",
+        "effect": "defense+5"
+    },
+    {
+        "id": 9,
+        "title": "Leg Armor",
+        "stackable": false,
+        "cost": 800,
+        "slug": "pants",
+        "description": "...",
+        "type": "armor_legs",
+        "effect": "defense+4"
+    },
+    {
+        "id": 10,
+        "title": "Helmet",
+        "stackable": false,
+        "cost": 600,
+        "slug": "helmets",
+        "description": "Probably, most important piece of armor.",
+        "type": "armor_head",
+        "effect": "defense+3"
+    },
+    {
+        "id": 11,
+        "title": "Boots",
+        "stackable": false,
+        "cost": 600,
+        "slug": "boots",
+        "description": "It's not safe to walk here without these boots.",
+        "type": "armor_feet",
+        "effect": "defense+2"
+    },
+    {
+        "id": 12,
+        "title": "Neckale",
+        "stackable": false,
+        "cost": 2000,
+        "slug": "neckale",
+        "description": "Powerful magic artifact.",
+        "type": "jewelry",
+        "effect": "hp+200"
+    },
+	{
+        "id": 12,
+        "title": "Ring",
+        "stackable": false,
+        "cost": 1500,
+        "slug": "rings",
+        "description": "Powerful magic artifact.",
+        "type": "jewelry",
+        "effect": "hp+150"
+    }
+]

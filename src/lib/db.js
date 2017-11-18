@@ -58,27 +58,27 @@ const get = () => {
     return state.db;
 }
 
-const register = (login, passowrd, nickname) => new Promise( (resolve, reject) => {
+const register = (login, passowrd, nickname) => new Promise((resolve, reject) => {
     let db = get();
 
     let accessToken = guid();
-    let dockerName = login+'Docker'
+    let dockerName = login + 'Docker'
 
     let userId = null;
 
     db.execute(
-        `
+            `
             insert into users
             ( login, password, accessToken, docker )
             values
             ( ${SqlString(login)}, ${SqlString(password)}, ${SqlString(accessToken)}, ${SqlString(docker)} );
         `
-    )
-    .then( result => {
+        )
+        .then(result => {
 
-        userId = result.insertId;
-        return db.execute(
-            `
+            userId = result.insertId;
+            return db.execute(
+                `
                 insert into heroes
                     (
                         login, 
@@ -106,16 +106,16 @@ const register = (login, passowrd, nickname) => new Promise( (resolve, reject) =
                         0
                     );
             `
-        )
-    })
-    .then( result => {
+            )
+        })
+        .then(result => {
 
-        return db.execute(`update users set heroId=${result.insertId} where id=${userId};`)
-    })
-    .then( () => {
-        resolve(accessToken);
-    })
-    .catch(reject);
+            return db.execute(`update users set heroId=${result.insertId} where id=${userId};`)
+        })
+        .then(() => {
+            resolve(accessToken);
+        })
+        .catch(reject);
 })
 
 const move = (object, newPosition) => {
@@ -148,6 +148,14 @@ const changeFiled = (object, newValue, predicate) => {
         `
     ).catch(console.log)
 }
+
+const getContent = (table) => new Promise((resolve, reject) => {
+    state.db.execute(`select * from ${table}`)
+        .then(([rows, fileds]) => {
+            resolve(rows)
+        })
+        .catch(console.log);
+});
 
 const SqlString = (s) => {
     if (s)
@@ -190,14 +198,14 @@ const SqlBool = (b) => {
     }
 };
 
-function guid () {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-  return s4()+s4()+s4()+s4()+
-    s4()+s4()+s4()+s4();
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    return s4() + s4() + s4() + s4() +
+        s4() + s4() + s4() + s4();
 }
 
 module.exports = {
