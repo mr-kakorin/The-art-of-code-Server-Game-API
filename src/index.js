@@ -5,7 +5,6 @@ const WebSocket = require('socket.io');
 const database = require('./lib/db.js').connect(require('../config.json').mysqlConnectionSettings);
 const MemoryManager = require('./lib/mem.js');
 
-const database = require('./lib/db.js');
 const dockerManager = require('./lib/dockerManager.js');
 const path = require('path');
 database.connect(require('../config.json').mysqlConnectionSettings);
