@@ -28,17 +28,20 @@ const directionToCoordinate = (direction) => {
 
 const move = (target) => {
 	return new Promise((resolve, reject) => {
-		let heroId = ManageCurrentMemory.instance.getHeroByAccessToken(target.accessToken);
+		let accessToken = target.accessToken.replace('docker', '');
+		let hero = ManageCurrentMemory.instance.getHeroByAccessToken(accessToken);
 
 		let object = {
-			id: heroId,
+			id: hero.id,
 			type: 'hero',
 		}
+		console.log('heroid: ', hero.id);
 
 		let changePosition = directionToCoordinate(target.direction);
 
 		let npos = ManageCurrentMemory.instance.move(object, changePosition);
 
+		console.log(npos);
 		if (npos) {
 			resolve({
 				object: object,

@@ -79,19 +79,21 @@ class Memory {
 	move(object, changePosition) {
 		let moveObjectId = object.id,
 			moveObjectType = object.type;
+		let obj = null;
 		switch (moveObjectType) {
 			case "hero":
 				this._players.forEach(player => {
 					if (player.id == moveObjectId) {
 						let newx = player.positionX + changePosition.x;
 						let newy = player.positionY + changePosition.y;
-						if (isFreePosition(newx, newy)) {
+						if (this.isFreePosition(newx, newy)) {
+							console.log('чоблясука');
 							player.positionX += changePosition.x;
 							player.positionY += changePosition.y;
-							return {
+							obj = {
 								x: player.positionX,
 								y: player.positionY
-							}
+							};
 						} else return false;
 					}
 					return;
@@ -116,6 +118,7 @@ class Memory {
 				})
 				break;
 		}
+		return obj;
 	}
 
 	get objects() {
@@ -124,16 +127,17 @@ class Memory {
 
 	isFreePosition(x, y) {
 		let result = true;
-		this._staticObjects.foreach(obj => {
+		this._staticObjects.forEach(obj => {
 			if (obj.x == x && obj.y == y) {
 				result = false;
 			}
 		})
-		this._dynamicObjects.foreach(obj => {
+		this._dynamicObjects.forEach(obj => {
 			if (obj.x == x && obj.y == y) {
 				result = false;
 			}
 		})
+		console.log('reorhk', result);
 		return result;
 	}
 
