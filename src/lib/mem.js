@@ -70,7 +70,11 @@ class Memory {
 	LoadInMemoryFromDB(tableName, resourceContainer) {
 		DB.loadContent(tableName)
 			.then(resources => {
+				console.log(resources);
 				resourceContainer = resources;
+			})
+			.then(()=>{
+				console.log('players', this._players)
 			})
 			.catch(err => {
 				console.log(err);

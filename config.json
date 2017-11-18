@@ -1,8 +1,8 @@
 {
     "mysqlConnectionSettings": {
         "host": "localhost",
-        "user": "mr_kakorin",
-        "password": "",
+        "user": "root",
+        "password": "root",
         "database": "TheArtOfCode"
     }
 }

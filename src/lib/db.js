@@ -262,5 +262,6 @@ module.exports = {
     getLoginByAccessToken,
     move: move,
     changeFiled: changeFiled,
-    loadContent
+    loadContent,
+    getHeroIdByToken
 };

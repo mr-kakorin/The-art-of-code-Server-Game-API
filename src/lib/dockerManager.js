@@ -29,10 +29,10 @@ const restartCode = (accessToken) => new Promise( (resolve, reject) => {
 })
 
 const createContainer = (login, accessToken) => new Promise( (resolve, reject) => {
-	exec(`docker run -d -e ACCESS_TOKEN=${accessToken} --name ${login} exampleocker`, (e, so, se) => {
-		console.log(`\t try start container: ${so}`);
-		console.log(`\t try start container: ${se}`);
-		resolve(true);
+	exec(`docker run -d -e ACCESS_TOKEN=${accessToken} --name ${login} exampledocker`, (e, so, se) => {
+		exec(`docker exec ${login} ./addtoken.sh ${accessToken}`,(e, so, se) => {
+			resolve(true);
+		})
 	})
 });
 
