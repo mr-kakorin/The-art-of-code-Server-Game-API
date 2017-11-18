@@ -40,8 +40,6 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 			delete WebSocketServer.clients[acessToken];
 		});
 	});
-
-
 });
 
 WebSocketServer.broadcast = (data) => {

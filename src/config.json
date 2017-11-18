@@ -1,0 +1,8 @@
+{
+    "mysqlConnectionSettings": {
+        "host": "localhost",
+        "user": "mr_kakorin",
+        "password": "",
+        "database": "stockfinder2"
+    }
+}

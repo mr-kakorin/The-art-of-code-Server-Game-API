@@ -7,6 +7,7 @@ exports.move = (socketMessage) => {
 	let target = {
 		newPosition: socketMessage.newPosition,
 		moveTargetId: socketMessage.moveTargetId,
+		moveTargetType:socketMessage.moveTargetType
 	}
 
 	//GameInformationAPI.move(target);
@@ -25,6 +26,7 @@ exports.attack = (socketMessage) => {
 	let target = {
 		damage: socketMessage.damage,
 		attackTargetId: socketMessage.attackTargetId,
+		attackTargetType:socketMessage.attackTargetType
 	}
 
 	//GameInformationAPI.attack(target);
@@ -43,11 +45,13 @@ exports.use = (socketMessage) => {
 	let source = {
 		useEffect: socketMessage.useEffect,
 		useSourceId: socketMessage.useSourceId,
+		useSourceType:socketMessage.useSourceType
 	};
 
 	let target = {
 		useEffect: socketMessage.useEffect,
 		useTargetId: socketMessage.useTargetId,
+		useTargetType:socketMessage.useTargetType
 	};
 
 	let usable = {
