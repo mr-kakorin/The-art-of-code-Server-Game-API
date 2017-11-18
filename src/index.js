@@ -11,13 +11,13 @@ database.connect(require('../config.json').mysqlConnectionSettings, (err) => {
 	mem = MemoryManager.instance;
 });
 
-
+const GameInformationAPI = require('./GameInformationAPI');
 
 const dockerManager = require('./lib/dockerManager.js');
 const path = require('path');
 
 const app = express();
-const socketActions = require('./GameAPISocketActions');
+//const socketActions = require('./GameAPISocketActions');
 
 app.use(require('body-parser')());
 app.get('/', (req, res) => res.send('ok'));
@@ -47,16 +47,16 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 
 		webSocketClient.on('readyForInitData', () => {
 			database.getHeroIdByToken(accessToken)
-			.then(heroId => {
-				let initData = {
-					hero: mem.getHero(heroId),
-					locations: mem.locations,
-					items: mem.items,
-					objects: mem.objects
-				}
-				console.log('initData')
-				webSocketClient.emit('initData', JSON.stringify(initData));
-			}).catch(console.log);			
+				.then(heroId => {
+					let initData = {
+						hero: mem.getHero(heroId),
+						locations: mem.locations,
+						items: mem.items,
+						objects: mem.objects
+					}
+					console.log('initData')
+					webSocketClient.emit('initData', JSON.stringify(initData));
+				}).catch(console.log);
 		});
 
 		WebSocketServer.clients[accessToken] = {
@@ -64,10 +64,27 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 			location: location || '',
 		};
 
-		Object.keys(socketActions).forEach(function(actionName) {
-			var fn = socketActions[actionName].bind(WebSocketServer);
-			WebSocketServer.clients[accessToken].socket.on(actionName, fn);
-		});
+		// Object.keys(socketActions).forEach(function(actionName) {
+		// 	var fn = socketActions[actionName].bind(WebSocketServer);
+		// 	WebSocketServer.clients[accessToken].socket.on(actionName, fn);
+		// });
+
+		WebSocketServer.clients[accessToken].socket.on('move', (socketMessage) => {
+			console.log('move')
+			let target = {
+				accessToken: socketMessage.accessToken,
+				direction: socketMessage.direction
+			};
+
+			GameInformationAPI.move(target)
+				.then(moveObject => {
+					let messageToAll = {
+						action: 'move',
+						object: moveObject,
+					};
+					WebSocketServer.broadcast(messageToAll);
+				})
+		})
 
 		WebSocketServer.clients[accessToken].socket.send('authed');
 
