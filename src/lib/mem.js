@@ -74,4 +74,4 @@ class Memory {
 }
 
 
-export Memory;
+module.exports = Memory;
