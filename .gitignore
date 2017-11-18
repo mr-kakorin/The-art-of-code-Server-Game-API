@@ -59,4 +59,5 @@ typings/
 
 userfiles/
 src/client.js
-config.*
+config.json
+src/config.json
