@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const url = require('url');
 const WebSocket = require('socket.io');
-const database = require('./lib/db.js').connect();
+const database = require('./lib/db.js').connect(require('../config.json').mysqlConnectionSettings);
 
 const app = express();
 const socketActions = require('./GameAPISocketActions');
