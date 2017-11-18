@@ -16,7 +16,7 @@ create table users (
     password varchar(60) not null,
     heroId int unsigned,
     docker varchar(60) not null,
-    acessToken varchar(60) not null,
+    accessToken varchar(60) not null,
     primary key (id)
 );
 

@@ -58,7 +58,7 @@ const get = () => {
     return state.db;
 }
 
-const register = (login, passowrd, nickname) => new Promise( (resolve, reject) => {
+const register = (login, password, nickname) => new Promise( (resolve, reject) => {
     let db = get();
 
     let accessToken = guid();
@@ -71,14 +71,14 @@ const register = (login, passowrd, nickname) => new Promise( (resolve, reject) =
             insert into users
             ( login, password, accessToken, docker )
             values
-            ( ${SqlString(login)}, ${SqlString(password)}, ${SqlString(accessToken)}, ${SqlString(docker)} );
+            ( ${SqlString(login)}, ${SqlString(password)}, ${SqlString(accessToken)}, ${SqlString(dockerName)} );
         `
     )
     .then( result => {
 
-        userId = result.insertId;
-        return db.execute(
-            `
+        console.log(result);
+        userId = result[0].insertId;
+        let str = `
                 insert into heroes
                     (
                         login, 
@@ -90,12 +90,13 @@ const register = (login, passowrd, nickname) => new Promise( (resolve, reject) =
                         attack, 
                         defence, 
                         lvl, 
-                        exp
+                        exp,
+                        location
                     )
                 values
                     (
                         ${SqlString(nickname)},
-                        ${result.insertId},
+                        ${result[0].insertId},
                         0,
                         0,
                         100,
@@ -103,19 +104,37 @@ const register = (login, passowrd, nickname) => new Promise( (resolve, reject) =
                         15,
                         5,
                         1,
-                        0
+                        0,
+                        'location'
                     );
-            `
-        )
+            `;
+        console.log(str);
+        return db.execute(str);
     })
     .then( result => {
 
-        return db.execute(`update users set heroId=${result.insertId} where id=${userId};`)
+        return db.execute(`update users set heroId=${result[0].insertId} where id=${userId};`)
     })
     .then( () => {
         resolve(accessToken);
     })
-    .catch(reject);
+    .catch(error => {
+        console.log(error);
+    });
+})
+
+const login = (login, password) => new Promise( (resolve, reject) => {
+    let db = get();
+
+    db.execute(`select * from users where login=${SqlString(login)};`)
+    .then( ([rows, fields]) => {
+        let accessToken = rows[0].accessToken;
+
+        resolve(accessToken);
+    }).catch( error => {
+        console.log(error);
+        reject(error);
+    })
 })
 
 const move = (object, newPosition) => {
@@ -205,6 +224,7 @@ module.exports = {
     disconnect: disconnect,
     get: get,
     register,
+    login,
     move: move,
     changeFiled: changeFiled,
 };
