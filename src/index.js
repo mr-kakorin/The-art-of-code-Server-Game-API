@@ -118,8 +118,10 @@ WebSocketServer.broadcast = (data) => {
 		if (WebSocketServer.clients[clientId].readyState === WebSocket.OPEN) {
 			if (!data.action)
 				WebSocketServer.clients[clientId].socket.send(data);
-			else
+			else {
+				console.log(data);
 				WebSocketServer.clients[clientId].socket.emit(data.action, JSON.stringify(data.object));
+			}
 		}
 	});
 };

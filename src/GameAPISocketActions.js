@@ -6,14 +6,17 @@ exports.move = (socketMessage) => {
 		accessToken: socketMessage.accessToken,
 		direction: socketMessage.direction
 	};
+	console.log(socketMessage);
 
+	let self = this;
+	console.log(this);
 	GameInformationAPI.move(target)
 		.then(moveObject => {
 			let messageToAll = {
 				action: 'move',
 				object: moveObject,
 			};
-			this.broadcast(messageToAll);
+			self.broadcast(messageToAll);
 		})
 }
 
