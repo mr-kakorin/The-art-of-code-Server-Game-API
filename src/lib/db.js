@@ -1,5 +1,5 @@
-const mysql = require("mysql2/promise");
-const config = require("../config.json");
+const mysql = require('mysql2/promise');
+const config = require('../config.json');
 
 const state = {
     db: null
@@ -13,6 +13,37 @@ const connect = (opts, done) => {
     mysql.createConnection(opts)
         .then(connection => {
             state.db = connection;
+            state.db.query("SET SESSION wait_timeout = 604800");
+
+            const handleDisconnect = () => {
+                mysql_obj.connection.query('select 1;')
+                    .then(response => {
+                        if (!response.Error)
+                            return true;
+                        else
+                            throw new Error('MySQL is in need to reconnect');
+                    })
+                    .catch(err => {
+                        mysql.createConnection(opts)
+                            .then(connection => {
+                                console.log('MySQL is reconnected');
+                                state.db = connection;
+                                state.db.query("SET SESSION wait_timeout = 604800");
+                                setTimeout(handleDisconnect, 1800000);
+                            })
+                            .catch(err => {
+                                console.log('Can not reconnect to MySQL:\n', err);
+                                setTimeout(handleDisconnect, 2000);
+                            })
+                    })
+            };
+
+            try {
+                handleDisconnect()
+            } catch (e) {
+                console.log('Error handleDisconnect Mysql:\n', e);
+            }
+
             done();
         })
         .catch(err => done(err));
@@ -25,7 +56,6 @@ const disconnect = () => {
 const get = () => {
     return state.db;
 }
-
 
 const register = (login, passowrd, nickname) => new Promise( (resolve, reject) => {
     let db = get();
@@ -87,73 +117,75 @@ const register = (login, passowrd, nickname) => new Promise( (resolve, reject) =
     .catch(reject);
 })
 
-const moveHero = (heroId, newPosition) => {
-    let db = get();
-
-    db.execute(
-        `
-            update heroes 
-            set positionX=${newPosition.x}, positionY=${newPosition.y}
-            where id = ${heroId};
-        `
-    ).catch(console.log)
-}
-
-const moveObject = (objectId, newPosition) => {
-    let db = get();
-
-    db.execute(
-        `
-            update objects 
-            set positionX=${newPosition.x}, positionY=${newPosition.y}
-            where id = ${objectId};
-        `
-    ).catch(console.log)
-}
-
 const move = (object, newPosition) => {
-    let db = get();
-    
+    let db = get(),
+        moveObjectId = object.id,
+        fromWhatMove = object.type === 'hero' ? "heroes" : "objects";
+
+    db.execute(
+        `
+            update ${fromWhatMove} 
+            set positionX = ${newPosition.x}, positionY = ${newPosition.y}
+            where id = ${moveObjectId};
+        `
+    ).catch(console.log)
+}
+
+const changeFiled = (object, newValue, predicate) => {
+    let db = get(),
+        changeObjectId = object.id,
+        changeObjectType = object.type,
+        fieldToChange = predicate.field;
+
+    let fromWhatMove = changeObjectType === 'hero' ? "heroes" : "Object";
+
+    db.execute(
+        `
+            update ${fromWhatMove} 
+            set ${fieldToChange} = ${newValue}
+            where id = ${changeObjectId};
+        `
+    ).catch(console.log)
 }
 
 const SqlString = (s) => {
     if (s)
-        s = s.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function(char) {
+        s = s.replace(/[\0\x08\x09\x1a\n\r''\\\%]/g, function(char) {
             switch (char) {
-                case "\0":
-                    return "\\0";
-                case "\x08":
-                    return "\\b";
-                case "\x09":
-                    return "\\t";
-                case "\x1a":
-                    return "\\z";
-                case "\n":
-                    return "\\n";
-                case "\r":
-                    return "\\r";
-                case "\"":
-                case "'":
-                case "\\":
-                case "%":
-                    return "\\" + char;
+                case '\0':
+                    return '\\0';
+                case '\x08':
+                    return '\\b';
+                case '\x09':
+                    return '\\t';
+                case '\x1a':
+                    return '\\z';
+                case '\n':
+                    return '\\n';
+                case '\r':
+                    return '\\r';
+                case '\'':
+                case '"':
+                case '\\':
+                case '%':
+                    return '\\' + char;
             }
         });
-    return (s === null ? "NULL" : `'${s}'`);
+    return (s === null ? 'NULL' : `'${s}'`);
 }
 
-const SqlNum = (n) => (n === null || isNaN(n) ? "NULL" : `${n}`);
+const SqlNum = (n) => (n === null || isNaN(n) ? 'NULL' : `${n}`);
 
 const SqlBool = (b) => {
     switch (b) {
         case true:
-            return "TRUE";
+            return 'TRUE';
 
         case false:
-            return "FALSE";
+            return 'FALSE';
 
         case null:
-            return "NULL";
+            return 'NULL';
     }
 };
 
@@ -172,4 +204,6 @@ module.exports = {
     disconnect: disconnect,
     get: get,
     register
+    move: move,
+    changeFiled: changeFiled,
 };
