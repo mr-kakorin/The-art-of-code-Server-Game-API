@@ -53,6 +53,44 @@ const move = (target) => {
 	});
 }
 
+const attack = (target) => {
+	return new Promise( (resolve, reject) => {
+		let accessToken = target.accessToken.replace('docker', '');
+		let hero = ManageCurrentMemory.instance.getHeroByAccessToken(accessToken);
+		let obj = ManageCurrentMemory.instance.getObjectById(target.objectId);
+
+		console.log(hero, obj);
+		let diffX = Math.abs( hero.positionX - obj.positionX );
+		let diffY = Math.abs( hero.positionY - obj.positionY );
+
+		if ( diffX + diffY > 1 ) {
+			resolve(false);
+			return;
+		}
+
+		let damage = hero.attack - obj.stats.defense;
+		obj.stats.hp -= damage
+
+		if ( obj.stats.hp <= 0 ) {
+			ManageCurrentMemory.instance.deleteObjectById(obj.id);
+
+			resolve({
+				action: 'dead',
+				objectId: obj.id
+			})
+		} else {
+
+			resolve({
+				action: 'update',
+				objectId: obj.id,
+				object: obj
+			})
+		}
+
+	})
+}
+
 module.exports = {
 	move: move,
+	attack
 }

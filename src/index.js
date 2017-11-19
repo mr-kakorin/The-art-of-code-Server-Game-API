@@ -46,7 +46,7 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		let location = authData.location;
 
 		webSocketClient.emit('auth', 'succsess');
-
+		mem.updateClients(WebSocketServer.clients)
 		webSocketClient.on('readyForInitData', () => {
 			database.getHeroIdByToken(accessToken)
 				.then(heroId => {
@@ -94,6 +94,36 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 				})
 		})
 
+		WebSocketServer.clients[accessToken].socket.on('attack', (socketMessage) => {
+			console.log('attack');
+
+			let target = {
+				accessToken: socketMessage.accessToken,
+				objectId: socketMessage.id,
+				objectType: socketMessage.type
+			}
+
+			GameInformationAPI.attack(target)
+			.then( object => {
+				console.log('attack result: ', object);
+				let messageToAll = {
+					action: 'attack',
+					object: object
+				}
+
+				if (!object) return false;
+				if (object.action === 'dead' ) {
+					WebSocketServer.broadcast({
+						action: 'dead',
+						object: {id:object.objectId, type:"mob"}
+					})
+				}
+			})
+			.catch( error =>{
+				console.log(error);
+			})
+		})
+
 		WebSocketServer.clients[accessToken].socket.send('authed');
 
 		webSocketClient.on('close', function() {
@@ -121,7 +151,6 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 			.then(accessToken => {
 				mem.updateUsers();
 				mem.updateHeroes();
-				mem.updateClients(WebSocketServer.clients);
 				webSocketClient.emit('register', accessToken);
 
 				dockerManager.createContainer(login, accessToken);
