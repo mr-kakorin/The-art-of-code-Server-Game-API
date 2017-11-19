@@ -167,33 +167,56 @@ class Memory {
 
 	spawnMobs() {
 		let mobsPath = path.join(__dirname, '../../resource/mobs.json');
-		this._mobsConf = {};
-		let self = this;
-		self.LoadInMemoryJson(mobsPath)
-			.then(resource => {
-				self._mobsConf = resource;
-				return self._mobsConf[0];
-			})
-			.then(boarConf => {
-				let x = getRandomInt(0, 100),
-					y = getRandomInt(0, 100);
+		if (!this._mobsConf) {
+			console.log('spawn first');
+			this._mobsConf = {};
+			let self = this;
+			self.LoadInMemoryJson(mobsPath)
+				.then(resource => {
+					self._mobsConf = resource;
+					return self._mobsConf[0];
+				})
+				.then(boarConf => {
+					let x = getRandomInt(0, 100),
+						y = getRandomInt(0, 100);
 
-				while (!self.isFreePosition(x, y)) {
-					x = getRandomInt(0, 100);
-					y = getRandomInt(0, 100);
-				}
+					while (!self.isFreePosition(x, y)) {
+						x = getRandomInt(0, 100);
+						y = getRandomInt(0, 100);
+					}
 
-				let boar = {
-					type: "mob",
-					id: getRandomInt(0, 10000),
-					positionX: x,
-					positionY: y,
-					stats: boarConf,
-					name:"boar"
-				};
-				self._dynamicObjects.push(boar);
-				self.notifyAllClients('mobSpawned', boar);
-			})
+					let boar = {
+						type: "mob",
+						id: getRandomInt(0, 10000),
+						positionX: x,
+						positionY: y,
+						stats: boarConf,
+						name: "boar"
+					};
+					self._dynamicObjects.push(boar);
+					self.notifyAllClients('mobSpawned', boar);
+				})
+		} else {
+			console.log('spawn');
+			let x = getRandomInt(0, 100),
+				y = getRandomInt(0, 100);
+
+			while (!this.isFreePosition(x, y)) {
+				x = getRandomInt(0, 100);
+				y = getRandomInt(0, 100);
+			}
+
+			let boar = {
+				type: "mob",
+				id: getRandomInt(0, 10000),
+				positionX: x,
+				positionY: y,
+				stats: boarConf,
+				name: "boar"
+			};
+			this._dynamicObjects.push(boar);
+			this.notifyAllClients('mobSpawned', boar);
+		}
 	}
 
 	spawnRoutine() {
@@ -230,6 +253,7 @@ class Memory {
 	 * @return {[type]}         [description]
 	 */
 	notifyAllClients() {
+		console.log('notify all')
 		let args = [].slice.call(arguments);
 		let clients, event, data;
 		if (args.length > 2) {
