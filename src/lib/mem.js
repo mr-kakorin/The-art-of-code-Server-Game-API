@@ -188,7 +188,8 @@ class Memory {
 					id: getRandomInt(0, 10000),
 					positionX: x,
 					positionY: y,
-					stats: boarConf
+					stats: boarConf,
+					name:"boar"
 				};
 				self._dynamicObjects.push(boar);
 				self.notifyAllClients('mobSpawned', boar);
@@ -242,7 +243,7 @@ class Memory {
 		if (!this._clients) {
 			this._clients = clients;
 		}
-		let self =this;
+		let self = this;
 		if (this._clients)
 			Object.keys(this._clients).forEach(clientId => {
 				self._clients[clientId].socket.emit(event, JSON.stringify(data));
