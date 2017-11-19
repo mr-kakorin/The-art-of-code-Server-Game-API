@@ -56,6 +56,8 @@ class Memory {
 		return this._items;
 	}
 
+
+
 	updateUsers() {
 		this.LoadInMemoryFromDB('users').then(resources => {
 			this._users = resources;
@@ -64,7 +66,7 @@ class Memory {
 	updateHeroes() {
 		this.LoadInMemoryFromDB('heroes').then(resources => {
 			this._players = resources;
-		});		
+		});
 	}
 
 	getHero(heroId) {
@@ -133,7 +135,7 @@ class Memory {
 	}
 
 	get objects() {
-		return this._staticObjects;
+		return this._staticObjects.concat(this._dynamicObjects);
 	}
 
 	isFreePosition(x, y) {
@@ -149,6 +151,58 @@ class Memory {
 			}
 		})
 		return result;
+	}
+
+	calcNumMobs(type) {
+		let result = 0;
+		this._dynamicObjects.forEach(dObject => {
+			let stats = dObject.stats;
+			if (stats) {
+				if (stats.name == type)
+					++result;
+			}
+		});
+		return result;
+	}
+
+	spawnMobs() {
+		let mobsPath = path.join(__dirname, '../../resource/mobs.json');
+		this._mobsConf = {};
+		let self = this;
+		self.LoadInMemoryJson(mobsPath)
+			.then(resource => {
+				self._mobsConf = resource;
+				return self._mobsConf[0];
+			})
+			.then(boarConf => {
+				let x = getRandomInt(0, 100),
+					y = getRandomInt(0, 100);
+
+				while (!self.isFreePosition(x, y)) {
+					x = getRandomInt(0, 100);
+					y = getRandomInt(0, 100);
+				}
+
+				let boar = {
+					type: "mob",
+					id: getRandomInt(0, 10000),
+					positionX: x,
+					positionY: y,
+					stats: boarConf
+				};
+				self._dynamicObjects.push(boar);
+				self.notifyAllClients('mobSpawned', boar);
+			})
+	}
+
+	spawnRoutine() {
+		let self = this;
+
+		if (this.calcNumMobs('boar') > 400) {
+			return;
+		}
+
+		setTimeout(self.spawnMobs.bind(self), 5000);
 	}
 
 	LoadInMemoryJson(resourcePath) {
@@ -168,6 +222,39 @@ class Memory {
 		return DB.loadContent(tableName)
 	}
 
+	/**
+	 * [notifyAllClients description]
+	 * @param  {[type]} clients [web socket]
+	 * @return {[type]}         [description]
+	 */
+	notifyAllClients() {
+		let args = [].slice.call(arguments);
+		let clients, event, data;
+		if (args.length > 2) {
+			clients = args[0];
+			event = args[1];
+			data = args[2];
+		} else {
+			event = args[0];
+			data = args[1];
+		}
+
+		if (!this._clients) {
+			this._clients = clients;
+		}
+		if (this._clients)
+			this._clients.forEach(client => {
+				client.socket.emit(event, JSON.stringify(data));
+			});
+	}
+
+	updateClients(clients) {
+		this._clients = clients;
+		if (this.calcNumMobs('boar') < 400) {
+			this.spawnRoutine();
+		}
+	}
+
 	get type() {
 		return this._type;
 	}
@@ -177,5 +264,8 @@ class Memory {
 	}
 }
 
+function getRandomInt(min, max) {
+	return Math.floor(Math.random() * (max - min)) + min;
+}
 
 module.exports = Memory;

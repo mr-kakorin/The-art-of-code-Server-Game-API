@@ -1,0 +1,12 @@
+[
+	{
+		"name" : "boar",
+		"type" : "animal",
+		"hp" : 20,
+		"expBenefit":2,
+		"goldBenefit":1,
+		"attack":3,
+		"defense":0,
+		"routingLength":5
+	}
+]

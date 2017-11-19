@@ -9,6 +9,7 @@ let mem = null;
 
 database.connect(require('../config.json').mysqlConnectionSettings, (err) => {
 	mem = MemoryManager.instance;
+	mem.spawnRoutine();
 });
 
 const GameInformationAPI = require('./GameInformationAPI');
@@ -118,9 +119,11 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 
 		database.register(login, password, herologin)
 			.then(accessToken => {
-				mem.updateUsers()
-				mem.updateHeroes()
+				mem.updateUsers();
+				mem.updateHeroes();
+				mem.updateClients(WebSocketServer.clients);
 				webSocketClient.emit('register', accessToken);
+
 				dockerManager.createContainer(login, accessToken);
 			});
 	});
