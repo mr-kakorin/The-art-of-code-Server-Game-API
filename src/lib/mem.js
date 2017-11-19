@@ -124,8 +124,26 @@ class Memory {
 			case "dynamicObject":
 				this._dynamicObjects.forEach(dObject => {
 					if (dObject.id == moveObjectId) {
-						dObject.positionX += changePosition.x;
-						dObject.positionY += changePosition.y;
+						let newx = dObject.positionX + changePosition.x;
+						let newy = dObject.positionY + changePosition.y;
+						if (this.isFreePosition(newx, newy)) {
+							dObject.positionX += changePosition.x;
+							dObject.positionY += changePosition.y;
+							obj = {
+								x: dObject.positionX,
+								y: dObject.positionY
+							};
+							notifyAllClients('moveMob', {
+								object: {
+									type: dObject.type,
+									id: dObject.id
+								},
+								newPosition: {
+									x: obj.x,
+									y: obj.y
+								}
+							})
+						} else return false;
 					}
 					return;
 				})
@@ -211,7 +229,7 @@ class Memory {
 				id: getRandomInt(0, 10000),
 				positionX: x,
 				positionY: y,
-				stats: boarConf,
+				stats: this._mobsConf[0],
 				name: "boar"
 			};
 			this._dynamicObjects.push(boar);
@@ -245,6 +263,45 @@ class Memory {
 
 	LoadInMemoryFromDB(tableName) {
 		return DB.loadContent(tableName)
+	}
+
+	mobsMoveRoutine() {
+		let self = this;
+		this._dynamicObjects.forEach(dObject => {
+			if (dObject.type == 'mob') {
+				console.log('move mob')
+				let stats = dObject.stats;
+				let routing = getRandomInt(0, stats.routingLength + 1);
+				let move = getRandomInt(-1, 2);
+				let condition = getRandomInt(-1, 2);
+				let x, y;
+				if (condition > 0) {
+					x = move;
+					y = 0;
+				} else {
+					x = 0;
+					y = move;
+				}
+				for (let i = 0; i < routing; ++i) {
+					self.move({
+						object: {
+							type: "dynamicObject",
+							id: dObject.id
+						},
+						changePosition: {
+							x: x,
+							y: y
+						}
+					})
+				}
+			}
+		})
+	}
+
+	AIRoutine() {
+		let self = this;
+		setInterval(self.spawnRoutine.bind(self), 5000);
+		setInterval(self.mobsMoveRoutine.bind(self), 5000);
 	}
 
 	/**

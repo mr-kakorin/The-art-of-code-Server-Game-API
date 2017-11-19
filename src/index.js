@@ -9,7 +9,7 @@ let mem = null;
 
 database.connect(require('../config.json').mysqlConnectionSettings, (err) => {
 	mem = MemoryManager.instance;
-	mem.spawnRoutine();
+	mem.AIRoutine();
 });
 
 const GameInformationAPI = require('./GameInformationAPI');
@@ -46,7 +46,7 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		let location = authData.location;
 
 		webSocketClient.emit('auth', 'succsess');
-
+		mem.updateClients(WebSocketServer.clients);
 		webSocketClient.on('readyForInitData', () => {
 			database.getHeroIdByToken(accessToken)
 				.then(heroId => {
@@ -89,7 +89,7 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 					};
 					WebSocketServer.broadcast(messageToAll);
 				})
-				.catch( error => {
+				.catch(error => {
 					console.log(error);
 				})
 		})
@@ -121,7 +121,6 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 			.then(accessToken => {
 				mem.updateUsers();
 				mem.updateHeroes();
-				mem.updateClients(WebSocketServer.clients);
 				webSocketClient.emit('register', accessToken);
 
 				dockerManager.createContainer(login, accessToken);
