@@ -242,9 +242,10 @@ class Memory {
 		if (!this._clients) {
 			this._clients = clients;
 		}
+		let self =this;
 		if (this._clients)
-			this._clients.forEach(client => {
-				client.socket.emit(event, JSON.stringify(data));
+			Object.keys(this._clients).forEach(clientId => {
+				self._clients[clientId].socket.emit(event, JSON.stringify(data));
 			});
 	}
 
