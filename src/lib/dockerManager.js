@@ -27,7 +27,7 @@ const restartCode = (accessToken) => new Promise( (resolve, reject) => {
 })
 
 const createContainer = (login, accessToken) => new Promise( (resolve, reject) => {
-	exec(`docker run --rm -d -e ACCESS_TOKEN=${accessToken} --name ${login} aoc`, (e, so, se) => {
+	exec(`docker run -d -e ACCESS_TOKEN=${accessToken} --name ${login} aoc`, (e, so, se) => {
 		resolve('ok');
 	})
 });

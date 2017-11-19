@@ -90,6 +90,22 @@ class Memory {
 		return this.getHero(heroId)
 	}
 
+	getObjectById(id) {
+		let object = null;
+		this._dynamicObjects.forEach( obj => {
+			if ( obj.id == id ) object = obj; 
+		})
+		return object;
+	}
+
+	deleteObjectById(id) {
+		let index = null;
+		this._dynamicObjects.forEach( (obj, i) => {
+			if ( obj.id === id ) index = i; 
+		})
+		this._dynamicObjects.splice(index, 1);
+	}
+
 	move(object, changePosition) {
 		let moveObjectId = object.id,
 			moveObjectType = object.type;
@@ -239,13 +255,13 @@ class Memory {
 
 	spawnRoutine() {
 		let self = this;
-
+		this._spawn = true;
 		if (this.calcNumMobs('boar') > 400) {
 			this._spawn = false;
 			return;
 		}
 
-		setTimeout(self.spawnMobs.bind(self), 5000);
+		setInterval(self.spawnMobs.bind(self), 5000);
 	}
 
 	LoadInMemoryJson(resourcePath) {
