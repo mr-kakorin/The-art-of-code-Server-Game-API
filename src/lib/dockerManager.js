@@ -21,18 +21,14 @@ const restartCode = (accessToken) => new Promise( (resolve, reject) => {
 	database.getLoginByAccessToken(accessToken)
 	.then( login => {
 		exec(`docker exec ${login} ./restart.sh http://91.225.131.223:8080/code/${login}`, (e, so, se) => {
-			console.log(`\t try restart code: ${so}`);
-			console.log(`\t try restart code ${se}`);
 			resolve(true);
 		});		
 	})
 })
 
 const createContainer = (login, accessToken) => new Promise( (resolve, reject) => {
-	exec(`docker run -d -e ACCESS_TOKEN=${accessToken} --name ${login} exampledocker`, (e, so, se) => {
-		exec(`docker exec ${login} ./addtoken.sh ${accessToken}`,(e, so, se) => {
-			resolve(true);
-		})
+	exec(`docker run --rm -d -e ACCESS_TOKEN=${accessToken} --name ${login} aoc`, (e, so, se) => {
+		resolve('ok');
 	})
 });
 

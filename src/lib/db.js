@@ -153,7 +153,7 @@ const getLoginByAccessToken = accessToken => new Promise((resolve, reject) => {
 
 const getHeroIdByToken = accessToken => new Promise((resolve, reject) => {
     let db = get();
-
+    accessToken = accessToken.replace('docker', '');
     db.execute(`select heroId from users where accessToken=${SqlString(accessToken)};`)
         .then(([rows, fields]) => {
             resolve(rows[0].heroId);

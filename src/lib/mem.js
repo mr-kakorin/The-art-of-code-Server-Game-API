@@ -56,6 +56,17 @@ class Memory {
 		return this._items;
 	}
 
+	updateUsers() {
+		this.LoadInMemoryFromDB('users').then(resources => {
+			this._users = resources;
+		});
+	}
+	updateHeroes() {
+		this.LoadInMemoryFromDB('heroes').then(resources => {
+			this._players = resources;
+		});		
+	}
+
 	getHero(heroId) {
 		let result = null;
 		this._players.forEach(player => {
@@ -68,6 +79,7 @@ class Memory {
 
 	getHeroByAccessToken(accessToken) {
 		let heroId = null;
+		console.log(this._users);
 		this._users.forEach(user => {
 			if (user.accessToken == accessToken) {
 				heroId = user.heroId;
@@ -87,7 +99,6 @@ class Memory {
 						let newx = player.positionX + changePosition.x;
 						let newy = player.positionY + changePosition.y;
 						if (this.isFreePosition(newx, newy)) {
-							console.log('чоблясука');
 							player.positionX += changePosition.x;
 							player.positionY += changePosition.y;
 							obj = {
@@ -122,7 +133,7 @@ class Memory {
 	}
 
 	get objects() {
-		return this._objects;
+		return this._staticObjects;
 	}
 
 	isFreePosition(x, y) {
@@ -137,7 +148,6 @@ class Memory {
 				result = false;
 			}
 		})
-		console.log('reorhk', result);
 		return result;
 	}
 

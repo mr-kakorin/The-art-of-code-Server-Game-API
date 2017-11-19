@@ -41,6 +41,7 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		console.log('received: %s', authData);
 		authData = JSON.parse(authData);
 		let accessToken = authData.accessToken;
+		console.log('access token: ', accessToken);
 		let location = authData.location;
 
 		webSocketClient.emit('auth', 'succsess');
@@ -48,7 +49,10 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 		webSocketClient.on('readyForInitData', () => {
 			database.getHeroIdByToken(accessToken)
 				.then(heroId => {
+					console.log('mem.object length: ', mem.objects.length);
+					console.log('mem.object[0]: ', mem.objects[0]);
 					let initData = {
+						objectsCount: mem.objects.length,
 						hero: mem.getHero(heroId),
 						locations: mem.locations,
 						items: mem.items,
@@ -84,6 +88,9 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 					};
 					WebSocketServer.broadcast(messageToAll);
 				})
+				.catch( error => {
+					console.log(error);
+				})
 		})
 
 		WebSocketServer.clients[accessToken].socket.send('authed');
@@ -111,8 +118,10 @@ WebSocketServer.on('connection', function connection(webSocketClient) {
 
 		database.register(login, password, herologin)
 			.then(accessToken => {
+				mem.updateUsers()
+				mem.updateHeroes()
 				webSocketClient.emit('register', accessToken);
-				dockerManager.createContainer(login), accessToken;
+				dockerManager.createContainer(login, accessToken);
 			});
 	});
 
@@ -136,11 +145,11 @@ WebSocketServer.broadcast = (data) => {
 			if (!data.action)
 				WebSocketServer.clients[clientId].socket.send(data);
 			else {
-				console.log(data);
 				WebSocketServer.clients[clientId].socket.emit(data.action, JSON.stringify(data.object));
 			}
 		}
 	});
+	//WebSocketServer.broadcast.emit(data.action,JSON.stringify(data.object));
 };
 
 server.listen(8080, function listening() {

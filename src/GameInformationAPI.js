@@ -41,7 +41,6 @@ const move = (target) => {
 
 		let npos = ManageCurrentMemory.instance.move(object, changePosition);
 
-		console.log(npos);
 		if (npos) {
 			resolve({
 				object: object,

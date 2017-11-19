@@ -16,23 +16,25 @@ function makeid() {
 socket.on('connect', () => {
 	let obj = {login: makeid(), password: 'password', nickname: 'nicknamedocker'};
 	obj = JSON.stringify(obj, null, 4);
-	socket.emit('register', obj);
+	/*socket.emit('register', obj);
 	socket.on('register', data => {
 		let obj = {accessToken: data};
 		obj = JSON.stringify(obj, null, 4);
 		socket.emit('auth', obj);
 		socket.on('auth', data => {
-			socket.emit('code', `let counter = setInterval( () => {console.log('${makeid()}');}, 5000)`)
+			socket.emit('readyForInitData', 'data');
+			socket.on('initData', console.log);
+			//socket.emit('code', `let counter = setInterval( () => {console.log('${makeid()}');}, 5000)`)
 		})
-	})
+	})*/
 	
-	/*socket.emit('auth', JSON.stringify({accessToken:'8f218a4b929e620da0a75d741b7211e8'}));
+	socket.emit('auth', JSON.stringify({accessToken:'8f218a4b929e620da0a75d741b7211e8'}));
 	socket.on('auth', obj => {
 		//socket.emit('code', `let counter = setInterval( () => {console.log('${makeid()}');}, 5000)`)
 		socket.on('initData', data => {
 			console.log(data);
 		})
-	})*/
+	})
 	console.log('is connected')
 });
 

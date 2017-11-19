@@ -9,7 +9,6 @@ exports.move = (socketMessage) => {
 	console.log(socketMessage);
 
 	let self = this;
-	console.log(this);
 	GameInformationAPI.move(target)
 		.then(moveObject => {
 			let messageToAll = {
