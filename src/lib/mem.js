@@ -200,6 +200,7 @@ class Memory {
 		let self = this;
 
 		if (this.calcNumMobs('boar') > 400) {
+			this._spawn = false;
 			return;
 		}
 
@@ -252,7 +253,7 @@ class Memory {
 
 	updateClients(clients) {
 		this._clients = clients;
-		if (this.calcNumMobs('boar') < 400) {
+		if (this.calcNumMobs('boar') < 400 && !this._spawn) {
 			this.spawnRoutine();
 		}
 	}
